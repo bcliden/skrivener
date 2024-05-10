@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "text_to_image"
-version = "0.0.1-beta"                                                    # or dynamic from git?
+version = "0.0.1-beta"
 authors = [{ name = "Benjamin Liden", email = "lidenb@oregonstate.edu" }]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">3.10"
 dependencies = [
     "pillow", 
-    "pydantic", 
-    "pydantic-settings",
+    "pydantic >= 2", 
+    "pydantic-settings >= 2",
     "zmq"
 ]
 

@@ -8,9 +8,13 @@ from PIL.Image import Image
 Image to b64
 """
 
+png_options = {
+    "optimize": True
+}
+
 def encode(image: Image) -> str:
     img_bytes = io.BytesIO()
-    image.save(img_bytes, format="png")
+    image.save(img_bytes, format="png", **png_options)
     return base64_encode(img_bytes.getvalue())
 
 def decode(encoded_image: str) -> Image:

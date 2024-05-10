@@ -1,84 +1,114 @@
 import logging
+import random
 from typing import Optional
-from time import sleep
+from importlib.resources import as_file
+
 from PIL import Image as im
 from PIL import ImageFont
 from PIL.Image import Image
 from PIL.ImageDraw import ImageDraw
 from PIL.ImageColor import getrgb
-from importlib.resources import as_file, files
 
+from text_to_image.color import ColorPalette, default_colors
+from text_to_image.font import default_font
+
+# types
 Coords = tuple[int, int, int, int]
 
+# globals
 logger = logging.getLogger(__name__)
 
-
-default_size = (800, 600)
-color = {"bg": "#a37a74", "text": "#e49273"}
+# defaults
+default_size = (512, 512)
 padding = 50
-
-default_font = files("text_to_image.font").joinpath("Super Creamy Personal Use.ttf")
-
-
-"""
-need a font...
-also let's consider using imagemagick if it's rly bad
-"""
 
 
 def height(c: Coords) -> int:
-    offset_y, offset_x, len_y, len_x = c
-    return len_y - offset_y
+    x0, _, x1, _ = c
+    return x1 - x0
 
 
 def width(c: Coords) -> int:
-    offset_y, offset_x, len_y, len_x = c
-    return len_x - offset_x
+    _, y0, _, y1 = c
+    return y1 - y0
 
 
-def set_text(text: str) -> Image:
+def get_wrapped_text(text: str, font: ImageFont.ImageFont, line_length: int) -> str:
+    """
+    I was going to use python's textwrap, but ttf fonts are not monospace.
+
+    I used this lovely algorithm instead:
+    https://stackoverflow.com/a/67203353
+    """
+    lines = [""]
+    for word in text.split():
+        line = f"{lines[-1]} {word}".strip()
+        if font.getlength(line) <= line_length:
+            lines[-1] = line
+        else:
+            lines.append(word)
+    return "\n".join(lines)
+
+
+def set_text(text: str, color: Optional[ColorPalette] = None) -> Image:
     i = im.new("RGB", default_size)
     draw = ImageDraw(i)
 
-    # draw bg
-    canvas: Coords = (
-        0 + padding,
-        0 + padding,
-        default_size[0] - padding,
-        default_size[1] - padding,
-    )
+    if color is None:
+        color = random.choice(default_colors)
+    logger.debug("using colors bg=%s txt=%s", color["bg"], color["text"])
 
+    # Draw the full width background color
+    canvas: Coords = (
+        0,
+        0,
+        default_size[0],
+        default_size[1],
+    )
     draw.rectangle(canvas, fill=getrgb(color["bg"]))
 
-    font_size = 50  # or some other max
-    size: Optional[Coords] = None
+    # get the interior (padded) dimensions
+    interior_canvas: Coords = (
+        canvas[0] + padding,
+        canvas[1] + padding,
+        canvas[2] - padding,
+        canvas[3] - padding,
+    )
+    x0, y0, *_ = interior_canvas
+    logger.debug("interior canvas size: %s", interior_canvas)
 
     with as_file(default_font) as font_file:
-        logger.info("loading font: %s", font_file)
+        logger.debug("loading font: %s", font_file)
         font = ImageFont.truetype(font_file)
-    # font = ImageFont.truetype('arial.ttf')
+
+    # begin looking for ideal font size
+    font_size = 50
+    wrapped_text_size: Optional[Coords] = None
 
     while (
-        size is None or height(size) > height(canvas) or width(size) > width(canvas)
+        wrapped_text_size is None
+        # the wrapped text doesn't fit in the canvas
+        or width(wrapped_text_size) > width(interior_canvas)
+        or height(wrapped_text_size) > height(interior_canvas)
     ) and font_size > 0:
         font = font.font_variant(size=font_size)
-        size = draw.multiline_textbbox((canvas[0], canvas[1]), text, font=font)
-        logger.info("size is: %s", size)
-        font_size -= 1
+        wrapped = get_wrapped_text(text, font, width(interior_canvas))
+        wrapped_text_size = draw.multiline_textbbox(
+            xy=(x0, y0), text=wrapped, font=font
+        )
+        font_size -= 2
 
-        if font_size == 0:
-            raise ValueError("too much text for the screen I guess")
+    if font_size <= 0:
+        raise ValueError(f"Could not fit text in {default_size} image at any size.")
 
-    if size is None:
-        # just to satisfy mypy really
-        raise ValueError("dunno, size was still None")
-    
-    logger.info("fit text size: %s", size)
-    logger.info("canvas size: %s", canvas)
-    logger.info("drawing text with font size=%s", font_size)
+    if wrapped_text_size is None:
+        raise ValueError("Dunno, just felt like it (wrapped text is still none)")
+
+    logger.debug("drawing text with font size=%s", font_size)
+
     draw.multiline_text(
-        xy=(size[0], size[1]),
-        text=text,
+        xy=(x0, y0),
+        text=wrapped,
         fill=getrgb(color["text"]),
         font=font,
     )

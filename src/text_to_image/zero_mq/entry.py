@@ -1,5 +1,8 @@
 import logging
+import sys
 
+from logging import StreamHandler
+from logging.handlers import RotatingFileHandler
 from signal import signal, SIGINT, SIG_DFL
 from typing import Optional
 
@@ -29,10 +32,14 @@ def main() -> None:
         level=cfg.loglevel.upper(),
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
-            logging.FileHandler(
-                "text_to_img-zmq.log",
+            # write out to log file
+            RotatingFileHandler(
+                filename="text_to_img-zmq.log",
+                maxBytes=1024 * 100,                # max file size: 100kB
+                backupCount=1                       # how many previous ones to keep?
             ),
-            logging.StreamHandler(),
+            # and to the process stderr
+            StreamHandler(sys.stderr),
         ],
     )
 
@@ -64,14 +71,15 @@ def main() -> None:
             request = Request.model_validate_json(recieved)
             logger.debug("successfully parsed json: %s", request)
 
-            image = typography.set_text(request.text)
+            image = typography.set_text(request.text, request.color)
             logger.info("successfully generated text image")
 
             reply = SuccessReply(image=image)
 
         except Exception as e:
-            # is it so bad to just dump the exception out?
-            logger.error("something broke in the core loop: %s", e, exc_info=True)
+            logger.exception("something broke in the core loop:")
+
+            # is it so bad to just dump the exception out in the reply?
             reply = ErrorReply(message=str(e))
 
         finally:
@@ -82,7 +90,7 @@ def main() -> None:
                 logger.error("reply is none after everything (bad!)", exc_info=True)
                 reply = ErrorReply(message="Something went wrong.")
 
-            logger.info("preparing to dump reply: %s", reply)
+            logger.debug("serializing reply: %s", reply)
             message = reply.model_dump_json()
 
             logger.info("responding with json payload of len=%d", len(message))
