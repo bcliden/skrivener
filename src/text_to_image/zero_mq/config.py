@@ -1,3 +1,4 @@
+import logging
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 """
@@ -15,3 +16,5 @@ class Config(BaseSettings):
 
     host: str = "*"
     port: str = '8672'
+    loglevel: str = 'info'
+
