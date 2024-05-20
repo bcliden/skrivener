@@ -37,7 +37,23 @@ You can change these in the `.env.example` file provided, make your own `.env`, 
 \* for more on this see [the Python Packaging Authority's introduction](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
 
 ## Communication Contract
-### Request
+
+Send and recieve data using a ZeroMQ REP socket:
+```py
+import zmq
+
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+socket.bind(f"tcp://{HOST}:{PORT}")
+
+# send response dict using send_json()
+socket.send_json({ "text": "Hello from CS361" })
+
+# recieve reply dict using recv_json()
+reply = socket.recv_json()
+```
+
+### Request Format
 The accepted parameters for generating an image are:
 - text:
    - required: Yes
@@ -74,7 +90,7 @@ or, specifying the colors:
 }
 ```
 
-### Response
+### Response Format
 
 All Skrivener responses have one common key:
 - status
