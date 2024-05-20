@@ -124,6 +124,10 @@ In this example, we sent one malformed color (#0fg).
 
 Because Skrivener uses Pydantic for data validation, any formatting or validation errors should be human readable.
 
+### Sequence Diagram
+
+![2024-05-20 14_18_37-Untitled _ Visual Paradigm Online — Mozilla Firefox](https://github.com/bcliden/skrivener/assets/27828594/51ef3ea6-3a05-4a87-b5fa-b520c8f32229)
+
 ## How To
 ### Using the encoded image response
 
