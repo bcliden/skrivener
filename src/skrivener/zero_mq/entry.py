@@ -8,9 +8,9 @@ from typing import Optional
 
 import zmq
 
-from text_to_image.zero_mq.config import Config
-from text_to_image.image import typography
-from text_to_image.zero_mq.models import Request, SuccessReply, ErrorReply
+from skrivener.zero_mq.config import Config
+from skrivener.image import typography
+from skrivener.zero_mq.models import Request, SuccessReply, ErrorReply
 
 logger = logging.getLogger(__name__)
 

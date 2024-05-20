@@ -4,8 +4,8 @@ from typing import Annotated, Literal, Optional
 from PIL.Image import Image
 from pydantic import BaseModel, Field, field_serializer, field_validator, ValidationInfo
 
-from text_to_image.color import ColorPalette, Validation
-from text_to_image.serialization.image import encode
+from skrivener.color import ColorPalette, Validation
+from skrivener.serialization.image import encode
 
 logger = logging.getLogger(__name__)
 

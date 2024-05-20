@@ -3,7 +3,7 @@ requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "text_to_image"
+name = "skrivener"
 version = "0.0.1-beta"
 authors = [{ name = "Benjamin Liden", email = "lidenb@oregonstate.edu" }]
 readme = "README.md"
@@ -17,14 +17,14 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/bcliden/text_to_image"
-Issues = "https://github.com/bcliden/text_to_image/issues"
+Homepage = "https://github.com/bcliden/skrivener"
+Issues = "https://github.com/bcliden/skrivener/issues"
 
 [tool.setuptools.package-data]
-"text_to_image.font" = ["*.ttf"]
+"skrivener.font" = ["*.ttf"]
 
 [project.scripts]
-"text_to_image" = "text_to_image.zero_mq.entry:main"
+"skrivener" = "skrivener.zero_mq.entry:main"
 
 [project.gui-scripts]
 # maybe just here

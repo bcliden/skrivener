@@ -9,8 +9,8 @@ from PIL.Image import Image
 from PIL.ImageDraw import ImageDraw
 from PIL.ImageColor import getrgb
 
-from text_to_image.color import ColorPalette, default_colors
-from text_to_image.font import default_font
+from skrivener.color import ColorPalette, default_colors
+from skrivener.font import default_font
 
 # types
 Coords = tuple[int, int, int, int]
