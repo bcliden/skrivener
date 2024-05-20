@@ -10,8 +10,9 @@ Skrivener is a service that accepts text and typesets it into an image. This ser
 
 Features:
 - Accepts up to 250 characters of UTF-8 text
-- PNG format
-- Pleasant default color pairings
+- Returns PNG formatted image
+- Pleasant color pairings
+  - can be customized
 - Unsurprising interfaces
     - JSON messages
     - Base64 encoding
@@ -126,7 +127,7 @@ Because Skrivener uses Pydantic for data validation, any formatting or validatio
 ## How To
 ### Using the encoded image response
 
-To decode the Base64 string in Python, use (the base64 module)[https://docs.python.org/3/library/base64.html]:
+To decode the Base64 string in Python, use [the base64 module](https://docs.python.org/3/library/base64.html):
 ```py
 import base64
 
@@ -147,7 +148,7 @@ image = im.open(bytes_buffer)
 image.show() # will open in your system viewer
 ```
 
-Also see the test client script in the repo at (/tests/client.py)[/tests/client.py#L52-L58]
+Also see the test client script in the repo at [/tests/client.py](/tests/client.py#L52-L58)
 
 ## Attributions
 
