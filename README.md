@@ -22,8 +22,8 @@ Features:
 2. Enter or initialize a Python virtual environment*
 3. Install this repo with `$ pip install .`
 4. Run this project
-  i. either execute `$ skrivener` (this command is placed in your $PATH by PIP)
-  ii. or execute `$ python -m skrivener`
+   - either execute `$ skrivener` (this command is placed in your $PATH by PIP)
+   - or execute `$ python -m skrivener`
 
 Skrivener reads some environment variables on initialization.
 The provided defaults are:
